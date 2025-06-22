@@ -89,8 +89,8 @@ function fetchAndFormatXKCDData(): string {
     }
     
     $comis = json_decode($response, true);    //Decode the JSON response into an associative array
-    $htmlFormal = "<h2>". $comis['title'] ."</h2>" .
-            "<img src = " . $comis['img'] . " alt = " . $comis['alt'] . "/>";
+    $htmlFormal = "<div 'display: flex; justify-content: center; align-items: center; height: 100vh; border'><h2 style>". $comis['title'] ."</h2><br>" .
+            "<img src = " . $comis['img'] . " alt = " . $comis['alt'] . "/></div> <br><br>";
     return $htmlFormal;
 }
 
