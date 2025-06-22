@@ -58,18 +58,44 @@ function unsubscribeEmail(string $email): bool {
     $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $filtered = array_filter($lines, fn($line) => !str_contains($line, $email));
     file_put_contents($file, implode(PHP_EOL, $filtered) . PHP_EOL);
+    return true; // Successfully unsubscribed
 }
 
 
 
 /**
  * Fetch random XKCD comic and format data as HTML.
+ * 
+ * formate of json data:
+ * {
+ *   "month": "6",
+ *   "num": 614,
+ *   "link": "",
+ *   "year": "2009",
+ *   "news": "",
+ *   "safe_title": "Woodpecker",
+ *   "transcript": "...",
+ *   "alt": "Anecdote text",
+ *   "img": "https://imgs.xkcd.com/comics/woodpecker.png",
+ *   "title": "Woodpecker",
+ *   "day": "12"
+ * }
  */
 function fetchAndFormatXKCDData(): string {
-    // TODO: Implement this function
+    $apiUrl = 'https://xkcd.com/info.0.json';
+    $response = file_get_contents($apiUrl);
+    if ($response === false) {
+        return '<p>Error fetching XKCD data.</p>';
+    }
+    
+    $comis = json_decode($response, true);    //Decode the JSON response into an associative array
+    $htmlFormal = "<h2>". $comis['title'] ."</h2>" .
+            "<img src = " . $comis['img'] . " alt = " . $comis['alt'] . "/>";
+    return $htmlFormal;
 }
 
 /**
+ * 
  * Send the formatted XKCD updates to registered emails.
  */
 function sendXKCDUpdatesToSubscribers(): void {
