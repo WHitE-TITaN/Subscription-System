@@ -89,8 +89,22 @@ function fetchAndFormatXKCDData(): string {
     }
     
     $comis = json_decode($response, true);    //Decode the JSON response into an associative array
-    $htmlFormal = "<div 'display: flex; justify-content: center; align-items: center; height: 100vh; border'><h2 style>". $comis['title'] ."</h2><br>" .
-            "<img src = " . $comis['img'] . " alt = " . $comis['alt'] . "/></div> <br><br>";
+    $maxNumber = $comis['num'];               // Get the latest comic number / largets number that can be used to fetch a random comic
+
+    $randomNumber = rand(1, $maxNumber);      // Generate a random comic number
+    $randomComicUrl = "https://xkcd.com/{$randomNumber}/info.0.json"; // Construct the URL for the random comic
+
+    // referch random comic data
+    $response = file_get_contents($randomComicUrl);     // Fetch the random comic data
+    if ($response === false) {
+        return '<p>Error fetching random XKCD comic.</p>';
+    }
+    $comis = json_decode($response, true); // Decode the random comic data into an associative array
+
+    $htmlFormal = "<div style = 'display: flex; flex-direction: column;  justify-content: center; align-items: center;'>" .
+            "<img src = " . $comis['img'] . " alt = " . $comis['alt'] . "/>
+            <h2 style = 'width: 100% padding-top 30px'>". $comis['title'] ."</h2>
+            </div>";
     return $htmlFormal;
 }
 
