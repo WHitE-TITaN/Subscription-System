@@ -14,18 +14,34 @@ function generateVerificationCode(): string {
 function sendVerificationEmail(string $email, string $code): bool {
     $task = $_SESSION['action'];
     $to = $email;
-    $subject = "Your OTP Code for $task";
-    $message = "Hello! Your OTP code is: $code
+    $subject = "Your OTP Code for " . $task;
+    $message = "
+                <html>
+                <head>
+                    <title>Verification Code</title>
+                </head>
+                    <body>
+                        <h1>Hello!</h1>
+                        <p>
+                            Your OTP code is:<strong>$code</strong><br>
 
-                Please use this code to verify your email address for $task.
-                If you did not request this, please ignore this email.
-                
-                
-                Click here to unsubscribe - 'http://localhost/xkcd-WHitE-TITaN/src/unsubscribe.php'
+                            Please use this code to verify your email address for <strong>$task</strong>.
+                            If you did not request this, please ignore this email.
+                            
+                            
+                            Click here to unsubscribe - 'http://localhost/xkcd-WHitE-TITaN/src/unsubscribe.php'
 
 
-                thank you for using our service!";
-    if(emailService($to, $subject, $message)) {
+                            thank you for using our service!
+                        </p>
+                    </body>
+                </html>";
+    
+    $headers  = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+    $headers .= "From: noreply@gmail.com\r\n";
+
+    if(emailService($to, $subject, $message, $headers)) {
         return true;
     } else {
         return false; // Email sending failed
