@@ -130,7 +130,27 @@ function fetchAndFormatXKCDData(): string {
  */
 function sendXKCDUpdatesToSubscribers(): void {
   $file = __DIR__ . '/registered_emails.txt';
-    // TODO: Implement this function
+  if( !file_exists($file)) {
+      return; // No registered emails, nothing to send
+  }
+  $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+  $htmlContent = fetchAndFormatXKCDData(); // Fetch and format the XKCD data
+
+  $subject = "XKCD Comic";
+  $header = "MIME-Version: 1.0\r\n";
+  $header .= "Content-type: text/html; charset=UTF-8\r\n";
+  $header .= "From: davilk411@gmail.com\r\n"; // Use domain email in production
+
+    foreach ($lines as $line) {
+        $email = explode(" ", $line)[0]; // Extract the email from the line
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) { // Validate email format
+            if (!emailService($email, $subject, $htmlContent)) {
+                error_log("Failed to send email to:" . $email); // Log error if email sending fails
+            }
+        } else {
+            error_log("Invalid email format: " . $email); // Log invalid email format
+        }
+    }
 }
 
 
