@@ -101,6 +101,7 @@ function fetchAndFormatXKCDData(): string {
     $apiUrl = 'https://xkcd.com/info.0.json';
     $response = file_get_contents($apiUrl);
     if ($response === false) {
+        generateLog("XKCD Update", "Error fetching XKCD data");
         return '<p>Error fetching XKCD data.</p>';
     }
     
@@ -113,6 +114,7 @@ function fetchAndFormatXKCDData(): string {
     // referch random comic data
     $response = file_get_contents($randomComicUrl);     // Fetch the random comic data
     if ($response === false) {
+        generateLog("XKCD Update", "Error fetching random comic");
         return '<p>Error fetching random XKCD comic.</p>';
     }
     $comis = json_decode($response, true); // Decode the random comic data into an associative array
@@ -121,6 +123,7 @@ function fetchAndFormatXKCDData(): string {
             "<img src = " . $comis['img'] . " alt = " . $comis['alt'] . "/>
             <h2 style = 'width: 100% padding-top 30px'>". $comis['title'] ."</h2>
             </div>";
+    generateLog("XKCD Update", "Fetch Random Comic" . $comis['num'] . " - " . $comis['safe_title']);
     return $htmlFormal;
 }
 
@@ -133,6 +136,7 @@ function sendXKCDUpdatesToSubscribers(): void {
   if( !file_exists($file)) {
       return; // No registered emails, nothing to send
   }
+
   $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
   $htmlContent = fetchAndFormatXKCDData(); // Fetch and format the XKCD data
 
@@ -151,6 +155,7 @@ function sendXKCDUpdatesToSubscribers(): void {
             error_log("Invalid email format: " . $email); // Log invalid email format
         }
     }
+    generateLog("XKCD Updates", "Send to all registered emails");
 }
 
 
@@ -185,4 +190,18 @@ function emailService($to, $subject, $message): bool {
     } else {
         return false;
     }
+}
+
+
+/*
+    ** generate Log for all the actions performed
+*/
+
+function generateLog(string $action, string $operatonPerformed): void{
+    $logFile = __DIR__ . 'dev/log.txt';
+    $timestamp = date("Y-m-d H:i:s");
+    $logEntry = "[$timestamp] Action: $action, Operation: $operatonPerformed" . PHP_EOL;
+
+    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+    error_log($logEntry); // Also log to PHP error log
 }
