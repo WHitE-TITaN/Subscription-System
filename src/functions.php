@@ -42,8 +42,10 @@ function sendVerificationEmail(string $email, string $code): bool {
     $headers .= "From: noreply@gmail.com\r\n";
 
     if(emailService($to, $subject, $message, $headers)) {
+        generateLog("Email Verification", "Sent verification code to $email");
         return true;
     } else {
+        generateLog("Email Verification", "Failed to send verification code to $email");
         return false; // Email sending failed
     }
 }
@@ -69,11 +71,15 @@ function registerEmail(string $email): bool {
  */
 function unsubscribeEmail(string $email): bool {
   $file = __DIR__ . '/registered_emails.txt';
-    if(!file_exists($file)) return false; // File does not exist, nothing to unsubscribe
+    if(!file_exists($file)){
+        generateLog("Update Users List", "File Not Exisit");
+        return false;                       // File does not exist, nothing to unsubscribe
+    }
 
     $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $filtered = array_filter($lines, fn($line) => !str_contains($line, $email));
     file_put_contents($file, implode(PHP_EOL, $filtered) . PHP_EOL);
+    generateLog("Update Users List", "Unsubscribed email: $email");
     return true; // Successfully unsubscribed
 }
 
@@ -148,10 +154,13 @@ function sendXKCDUpdatesToSubscribers(): void {
     foreach ($lines as $line) {
         $email = explode(" ", $line)[0]; // Extract the email from the line
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) { // Validate email format
+            
             if (!emailService($email, $subject, $htmlContent)) {
+                generateLog("XKCD Updates", "Failed to send email to: $email");
                 error_log("Failed to send email to:" . $email); // Log error if email sending fails
             }
         } else {
+            generateLog("XKCD Updates", "Invalid email format: $email");
             error_log("Invalid email format: " . $email); // Log invalid email format
         }
     }
@@ -167,6 +176,7 @@ function sendXKCDUpdatesToSubscribers(): void {
 function isEmailRegistered(string $email): bool {
     $file = __DIR__ . '/registered_emails.txt';
     if (!file_exists($file)) {
+        generateLog("Check Email Registration", "File Not Found");
         return false; // File does not exist, no emails registered
     }
 
