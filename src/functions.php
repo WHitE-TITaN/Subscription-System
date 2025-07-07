@@ -183,9 +183,11 @@ function isEmailRegistered(string $email): bool {
     $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos($line, $email) === 0) { // Check if the line starts with the Email is registered
+            generateLog("Check Email Registration", "Email found already Registred: $email");
             return true; 
         }
     }
+    generateLog("Check Email Registration", "Email not found: $email");
     return false; // Email not found in the registered emails
 }
 
@@ -208,7 +210,7 @@ function emailService($to, $subject, $message): bool {
 */
 
 function generateLog(string $action, string $operatonPerformed): void{
-    $logFile = __DIR__ . 'dev/log.txt';
+    $logFile = __DIR__ . '/dev/log.txt';
     $timestamp = date("Y-m-d H:i:s");
     $logEntry = "[$timestamp] Action: $action, Operation: $operatonPerformed" . PHP_EOL;
 
