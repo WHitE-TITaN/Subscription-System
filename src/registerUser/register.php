@@ -69,3 +69,20 @@ else{
     </form>
 </div>
 
+
+
+
+
+
+<div id="emailExistsPopup" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -30%); background:#fff; border:2px solid #333; padding:30px 40px; z-index:1000; box-shadow:0 2px 10px rgba(0,0,0,0.3); border-radius:10px;">
+    <p style="font-size:18px; color:#d00;">This email is already registered!</p>
+    <button onclick="document.getElementById('emailExistsPopup').style.display='none';" style="margin-top:10px; padding:5px 15px; border-radius:5px; border:none; background:#333; color:#fff;">Close</button>
+</div>
+
+<script>
+    // Check if the URL contains ?email_exists=1
+    if (window.location.search.includes('email_exists=1')) {
+        document.getElementById('emailExistsPopup').style.display = 'block';
+    }
+</script>
+
